@@ -1,4 +1,6 @@
-// 快速排序:分治思想
+// 希尔排序
+// 思想:将数据按某个"增量"划分为若干个子序列,分别执行插入排序,最后再对整体执行插入排序
+// 插入排序在元素基本有序的情况下具有很高的效率
 #include <iostream>
 #include <fstream>
 #include <sys/time.h>
@@ -8,27 +10,30 @@ std::ifstream fin("data.in");
 std::ofstream fout("data.out");
 
 #define MAX 1024*1024
-// 升序,不稳定,时间复杂度平均O(nlg(n)),最坏O(n^2)
-void quickSort(int array[], int left, int right)
+// 升序,不稳定,时间复杂度O(nlgn)
+void shellSort(int array[], int num)
 {
-	if(left < right)
+	int i, j, gap;
+	for(gap = num/2; gap > 0; gap /= 2) // 步长(不断缩短步长)
 	{
-		int key = array[left];
-		int low = left;
-		int high = right;
-		while(low < high)
+		for(i=0; i<gap; ++i) // 步数(组数)
 		{
-			while(low < high && array[high] > key)
-				{high--;}
-			array[low] = array[high];
-			
-			while(low < high && array[low] <= key)// 考虑到有相同元素,故而 array[low] <= key
-				{low++;}
-			array[high] = array[low];
+			// 对组内的数据,进行插入排序
+			for(j=i+gap; j<num; j += gap)
+			{
+				if(array[j] < array[j-gap])
+				{
+					int temp = array[j];
+					int k = j - gap;
+					while(k>0 && array[k] > temp)
+					{
+						array[k+gap] = array[k];
+						k -= gap;
+					}
+					array[k+gap] = temp;
+				}
+			}
 		}
-		array[low] = key;
-		quickSort(array, left, low-1);
-		quickSort(array, low+1, right);
 	}
 }
 
@@ -45,10 +50,10 @@ int main()
 	int num = 0;
 	while(fin >> array[num])
 		++num;
-
+		
 	long start = getCurrentTime();
 	std::cout << "before sort(ms): " << start << std::endl;
-	quickSort(array, 0, num-1);
+	shellSort(array, num);
 	long end = getCurrentTime();
 	std::cout << "after sort(ms): " << end << std::endl << "cost time(ms): " << (end-start) << std::endl;
 

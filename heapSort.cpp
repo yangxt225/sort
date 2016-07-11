@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sys/time.h>
+#include <unistd.h> // sleep(3);
 
 std::ifstream fin("data.in");
 std::ofstream fout("data.out");
@@ -66,6 +68,13 @@ void sortHeap(std::vector<int>& vec)
 	std::cout << std::endl;
 }
 
+long getCurrentTime()    
+{    
+   struct timeval tv;    
+   gettimeofday(&tv,NULL);    
+   return tv.tv_sec * 1000 + tv.tv_usec / 1000;    
+} 
+
 int main()
 {	
 	std::vector<int> m_vec;
@@ -75,16 +84,20 @@ int main()
 	std::cout << "Make Heap: \n";	
 	for(std::vector<int>::iterator it=m_vec.begin(); it!=m_vec.end(); ++it)
 	{
-		std::cout << *it << ", ";
+		//std::cout << *it << ", ";
 	}
 
+	long start = getCurrentTime();
+	std::cout << "before sort(ms): " << start << std::endl;
 	sortHeap(m_vec);
+	long end = getCurrentTime();
+	std::cout << "after sort(ms): " << end << std::endl << "cost time(ms): " << (end-start) << std::endl;
 
 	fin.close();
 	std::cout << "Sort Heap: \n";
 	for(std::vector<int>::iterator it=m_vec.begin(); it!=m_vec.end(); ++it)
 	{
-		std::cout << *it << ", ";
+		//std::cout << *it << ", ";
 		fout << *it << ", ";
 	}
 	
